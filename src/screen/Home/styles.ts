@@ -14,6 +14,7 @@ export const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: colors.gray_500,
+    color: colors.gray_300,
     height: 54,
     borderRadius: 6,
     padding: 16,
@@ -85,7 +86,8 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     flexDirection: 'row',
-    padding: 12
+    padding: 12,
+    marginBottom: 8
   },
   cardText: {
     color: colors.gray_100,

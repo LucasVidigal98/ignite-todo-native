@@ -3,9 +3,34 @@ import { styles } from "./styles";
 import { Header } from "../../components/Header";
 import { colors } from "../../global/colors";
 import { useState } from "react";
+import BouncyCheckbox from "react-native-bouncy-checkbox";
 
 export function Home() {
-  const [todoList, setTodoList] = useState<string[]>(['Integer urna interdum massa'])
+  const [todoList, setTodoList] = useState<string[]>([]);
+  const [selectedList, setSelectedList] = useState<boolean[]>([]);
+  const [todoDescription, setTodoDescription] = useState('');
+  const [createdCount, setCreatedCout] = useState(0);
+  const [finishedCount, setFinishedCount] = useState(0);
+
+  function handleAddNewTodo() {
+    setTodoList([...todoList, todoDescription]);
+    setSelectedList([...selectedList, false]);
+    setCreatedCout(createdCount + 1);
+
+    setTodoDescription('');
+  }
+
+  function handleDeleteTodo(index: number) {
+    setTodoList(todoList.filter((_, i) => i !== index));
+    setSelectedList(selectedList.filter((_, i) => i !== index));
+    setCreatedCout(createdCount - 1);
+  }
+
+  function handleFinishTodo(index: number) {
+    selectedList[index] = !selectedList[index];
+    selectedList[index] ? setFinishedCount(finishedCount + 1) : setFinishedCount(finishedCount - 1);
+    setSelectedList(selectedList);
+  }
 
   return (
     <View style={styles.container}>
@@ -16,9 +41,11 @@ export function Home() {
           style={styles.input}
           placeholder="Adicione uma nova tarefa"
           placeholderTextColor={colors.gray_300}
+          value={todoDescription}
+          onChangeText={setTodoDescription}
         />
 
-        <TouchableOpacity style={styles.addButton}>
+        <TouchableOpacity style={styles.addButton} onPress={handleAddNewTodo}>
           <Image source={require('../../../assets/icons/plus.png')} />
         </TouchableOpacity>
       </View>
@@ -30,7 +57,7 @@ export function Home() {
           </Text>
 
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>0</Text>
+            <Text style={styles.badgeText}>{createdCount}</Text>
           </View>
         </View>
 
@@ -40,7 +67,7 @@ export function Home() {
           </Text>
 
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>0</Text>
+            <Text style={styles.badgeText}>{finishedCount}</Text>
           </View>
         </View>
       </View>
@@ -53,13 +80,26 @@ export function Home() {
           keyExtractor={item => item}
           renderItem={({ item, index }) => (
             <View style={styles.card}>
-              {/* <TouchableOpacity style={styles.radioDisabled}>
-                <Text>a</Text>
-              </TouchableOpacity> */}
+              <BouncyCheckbox
+                size={17.45}
+                fillColor={selectedList[index] ? colors.purple_dark : colors.blue_dark}
+                onPress={() => handleFinishTodo(index)}
+                isChecked={selectedList[index]}
+              />
 
-              <Text style={styles.cardText}>{item}</Text>
+              {selectedList[index] ?
+                <Text style={[
+                  styles.cardText, { textDecorationLine: 'line-through', color: colors.gray_300 }
+                ]}>
+                  {item}
+                </Text> :
+                <Text style={styles.cardText}>{item}</Text>
+              }
 
-              <Image source={require('../../../assets/icons/trash.png')} />
+
+              <TouchableOpacity onPress={() => handleDeleteTodo(index)}>
+                <Image source={require('../../../assets/icons/trash.png')} />
+              </TouchableOpacity>
             </View>
           )}
           showsVerticalScrollIndicator={false}
